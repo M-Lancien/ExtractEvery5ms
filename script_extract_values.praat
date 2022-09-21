@@ -188,16 +188,7 @@ for ifile to nfiles
 		#plusObject: current_pitch
 		#plusObject: current_pointproc   
  		#voiceReport$ = Voice report: start_sound,end_time , 75, 500, 1.3, 1.6, 0.03, 0.45
-		selectObject:current_pointproc   
-		jitter = Get jitter (local): start_sound, end_time*2, 0.0001, 0.02, 1.3
-		selectObject: current_sound
-		plusObject: current_pointproc 
-		shimmer =  Get shimmer (local): start_sound, end_time*2 , 0.0001, 0.02, 1.3, 1.6
-		#appendInfoLine: voiceReport$
-
-		appendFile: filename$, tab$, jitter, shimmer
-		removeObject:current_pointproc 
-		removeObject:current_pitch 
+		 
 
 ################################ COG, 
 
