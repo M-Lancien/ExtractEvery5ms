@@ -65,10 +65,8 @@ for ifile to nfiles
 
 	# Write the results file header
 	writeFile: filename$, "name_file", tab$, "start_time", tab$, "end_time"
-	#if extract_left_and_right_context
-	#	appendFile: results_file$, tab$, "previousLabel", tab$, "followingLabel"
-	#endif
-	#appendFile: filename$, newline$
+	
+	
 	if extract_F0
 		appendFile:filename$, tab$, "mean_F0(Hz)"
 	 
@@ -106,25 +104,23 @@ for ifile to nfiles
 	selectObject: current_sound 
 	sound_lenght = Get total duration
 	start_sound = Get start time
-	#start_sound= start_sound + 0.005
+	
+	
 	appendInfoLine: sound_lenght 
 	 
 	
 	repeat
-	#start_sound = Get start time
+	
 	
 	end_time=start_sound + extract_values_every
-	#Extract part: start_sound, end_time, "rectangular", 1, "yes"
-	#part_name = selected("Sound")
-	#select 'part_name'
-	#current_sound =  part_name
-	 
+		 
 	appendFile: filename$, newline$, sound$, tab$
 	 
 	
 	#appendInfoLine: end_time
 	appendFile: filename$, start_sound , tab$, end_time
-	
+
+#### F0
 	selectObject: current_sound 
 	current_pitch = To Pitch: 0.025, 50, 400
 	mean_f0 = Get value at time: end_time, "Hertz","Linear"
@@ -132,7 +128,7 @@ for ifile to nfiles
 		
 	#removeObject: current_pitch
 	 
-
+### HNR
 	selectObject: current_sound 	 
 	current_HNR = To Harmonicity (cc): 0.005, 50, 0.1, 1
  	mean_HNR = Get value at time: end_time, "cubic"
@@ -140,7 +136,7 @@ for ifile to nfiles
 		
 	removeObject: current_HNR
  
-
+#### I
 	 
 	selectObject: current_sound 
 	current_intensity = To Intensity: 100, 0, "yes"
@@ -151,8 +147,8 @@ for ifile to nfiles
 	removeObject: current_intensity
  
 	
+### F1,2,3,4 
 
-	 
 	selectObject: current_sound 
 		if (speakers_gender$ = "M")
 		current_formant = To Formant (burg): 0, 5, 5000, 0.025, 50
