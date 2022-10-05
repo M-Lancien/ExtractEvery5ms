@@ -65,8 +65,10 @@ for ifile to nfiles
 
 	# Write the results file header
 	writeFile: filename$, "name_file", tab$, "start_time", tab$, "end_time"
-	
-	
+	#if extract_left_and_right_context
+	#	appendFile: results_file$, tab$, "previousLabel", tab$, "followingLabel"
+	#endif
+	#appendFile: filename$, newline$
 	if extract_F0
 		appendFile:filename$, tab$, "mean_F0(Hz)"
 	 
@@ -104,42 +106,43 @@ for ifile to nfiles
 	selectObject: current_sound 
 	sound_lenght = Get total duration
 	start_sound = Get start time
-	
-	
+	#start_sound= start_sound + 0.005
 	appendInfoLine: sound_lenght 
 	 
 	
+	selectObject: current_sound 
+	current_pitch = To Pitch: 0.025, 50, 400
+	current_HNR = To Harmonicity (cc): 0.005, 50, 0.1, 1
+	current_intensity = To Intensity: 100, 0, "yes"
+
 	repeat
-	
+	#start_sound = Get start time
 	
 	end_time=start_sound + extract_values_every
-		 
+ 
 	appendFile: filename$, newline$, sound$, tab$
 	 
 	
 	#appendInfoLine: end_time
 	appendFile: filename$, start_sound , tab$, end_time
-
-#### F0
-	selectObject: current_sound 
-	current_pitch = To Pitch: 0.025, 50, 400
+	selectObject: current_pitch
 	mean_f0 = Get value at time: end_time, "Hertz","Linear"
 	appendFile: filename$, tab$, mean_f0
 		
 	#removeObject: current_pitch
 	 
-### HNR
+
 	selectObject: current_sound 	 
-	current_HNR = To Harmonicity (cc): 0.005, 50, 0.1, 1
+	selectObject: current_HNR
  	mean_HNR = Get value at time: end_time, "cubic"
 	appendFile: filename$, tab$, mean_HNR
 		
 	removeObject: current_HNR
  
-#### I
+
 	 
 	selectObject: current_sound 
-	current_intensity = To Intensity: 100, 0, "yes"
+	selectObject: current_intensity
 	mean_intensity=Get value at time: end_time, "cubic"						            
 	#mean_intensity = Get value at time: end_time, "dB"
 	appendFile: filename$, tab$, mean_intensity
@@ -147,8 +150,8 @@ for ifile to nfiles
 	removeObject: current_intensity
  
 	
-### F1,2,3,4 
 
+	 
 	selectObject: current_sound 
 		if (speakers_gender$ = "M")
 		current_formant = To Formant (burg): 0, 5, 5000, 0.025, 50
@@ -184,9 +187,45 @@ for ifile to nfiles
 		#plusObject: current_pitch
 		#plusObject: current_pointproc   
  		#voiceReport$ = Voice report: start_sound,end_time , 75, 500, 1.3, 1.6, 0.03, 0.45
-		 
+		selectObject:current_pointproc   
+		jitter = Get jitter (local): start_sound, end_time*2, 0.0001, 0.02, 1.3
+		selectObject: current_sound
+		plusObject: current_pointproc 
+		shimmer =  Get shimmer (local): start_sound, end_time*2 , 0.0001, 0.02, 1.3, 1.6
+		#appendInfoLine: voiceReport$
 
-################################ COG, 
+		appendFile: filename$, tab$, jitter, shimmer
+		removeObject:current_pointproc 
+		removeObject:current_pitch 
+
+################################ COG, just notes, nothing done yet
+ 				
+				
+				selectObject: current_sound  
+				start_span = start_sound
+				end_span = end_time
+				Extract part: start_span, end_span, "rectangular", 1, "yes"
+				part_name = selected("Sound")
+				select 'part_name'
+
+				To Spectrum... Fast
+				Cepstral smoothing: 1000
+				cogStart = Get centre of gravity: 2
+				sdevStart = Get standard deviation: 2
+				skewStart = Get skewness: 2
+				kurtStart = Get kurtosis: 2 
+				 
+				#spec=Extract visible spectrogram
+				selectObject: spec
+				#current_spec=To Spectrum (slice): 0
+				#selectObject: current_spec
+				#cog=Get centre of gravity: 2
+				#kurt= Get kurtosis... 2
+				#skew=Get skewness: 2
+
+	
+				appendFile: filename$, tab$, cog, tab$, kurt, skew
+				removeObject: spec 
 
 ################################ spectral tilt : nothing done yet
 
@@ -203,3 +242,5 @@ until end_time>sound_lenght
 appendInfoLine: "end"
  
 endfor
+
+	 
